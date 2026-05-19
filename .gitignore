@@ -1,2 +1,4 @@
 node_modules/
 src/firebase-config.ts
+.agents/
+skills-lock.json
