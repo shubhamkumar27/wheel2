@@ -43,9 +43,9 @@ function sanitizeName(raw: string): string { return raw.trim().slice(0, 60); }
 const isJoin = new URLSearchParams(location.search).has('join');
 if (isJoin) {
   (document.getElementById('presenterView') as HTMLElement).style.display = 'none';
+  (document.getElementById('joinView') as HTMLElement).style.display = 'flex';
   initJoinView();
 } else {
-  (document.getElementById('joinView') as HTMLElement).style.display = 'none';
   initPresenterView();
 }
 

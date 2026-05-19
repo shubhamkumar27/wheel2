@@ -637,7 +637,7 @@
   <!-- ═══════════════════════════════════════════════════════════
        JOIN VIEW  (shown when ?join is in the URL — mobile)
   ════════════════════════════════════════════════════════════ -->
-  <div id="joinView">
+  <div id="joinView" style="display:none">
     <div class="join-wrap">
 
       <!-- Branding -->
@@ -13720,9 +13720,9 @@
   var isJoin = new URLSearchParams(location.search).has("join");
   if (isJoin) {
     document.getElementById("presenterView").style.display = "none";
+    document.getElementById("joinView").style.display = "flex";
     initJoinView();
   } else {
-    document.getElementById("joinView").style.display = "none";
     initPresenterView();
   }
   function initJoinView() {
