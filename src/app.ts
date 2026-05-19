@@ -30,6 +30,7 @@ const COLORS: string[] = [
 ];
 
 const PAGE_URL = 'https://shubhamkumar27.github.io/wheel2/';
+// Custom domain alias: http://shubhamkumar.tech/wheel2/
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
