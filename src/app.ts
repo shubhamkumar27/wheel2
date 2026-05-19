@@ -149,6 +149,33 @@ function initPresenterView(): void {
 
   addBtn.addEventListener('click', addName);
   nameInput.addEventListener('keydown', e => { if (e.key === 'Enter') addName(); });
+
+  // Fullscreen toggle
+  const fsBtn = document.getElementById('fsBtn') as HTMLButtonElement;
+  const presenterEl = document.getElementById('presenterView') as HTMLElement;
+
+  const updateFsBtn = () => {
+    const isFs = !!(document.fullscreenElement || (document as unknown as Record<string, unknown>).webkitFullscreenElement);
+    fsBtn.textContent = isFs ? '⛶ Exit' : '⛶ Fullscreen';
+  };
+  document.addEventListener('fullscreenchange', updateFsBtn);
+  document.addEventListener('webkitfullscreenchange', updateFsBtn);
+
+  fsBtn.addEventListener('click', () => {
+    if (!document.fullscreenElement && !(document as unknown as Record<string, unknown>).webkitFullscreenElement) {
+      const req = presenterEl.requestFullscreen?.bind(presenterEl)
+        ?? (presenterEl as unknown as Record<string, () => Promise<void>>).webkitRequestFullscreen?.bind(presenterEl);
+      req?.();
+    } else {
+      (document.exitFullscreen?.bind(document)
+        ?? (document as unknown as Record<string, () => Promise<void>>).webkitExitFullscreen?.bind(document))?.();
+    }
+  });
+
+  // Keyboard shortcut: F = toggle fullscreen
+  document.addEventListener('keydown', e => {
+    if (e.key === 'f' || e.key === 'F') fsBtn.click();
+  });
 }
 
 // Global handler for per-row remove buttons
