@@ -106,11 +106,9 @@ function initPresenterView(): void {
   const wheel = new WheelApp();
 
   // QR code → join URL
-  QRCode.toCanvas(
-    document.getElementById('qrCanvas') as HTMLCanvasElement,
-    JOIN_URL,
-    { width: 160, margin: 1, color: { dark: '#0d0d1a', light: '#ffffff' } }
-  ).catch(console.error);
+  QRCode.toDataURL(JOIN_URL, { width: 320, margin: 2, color: { dark: '#000000', light: '#ffffff' } })
+    .then(url => { (document.getElementById('qrImg') as HTMLImageElement).src = url; })
+    .catch(err => { console.error('QR failed', err); });
 
   // Real-time sync from Firebase
   onValue(namesRef, (snap) => {
@@ -133,18 +131,27 @@ function initPresenterView(): void {
   const addName = async () => {
     const name = sanitizeName(nameInput.value);
     if (!name) return;
-    const snap = await get(namesRef);
-    if (snap.exists()) {
-      const entries = Object.values(snap.val() as Record<string, DbEntry>);
-      if (entries.some(en => en.name.toLowerCase() === name.toLowerCase())) {
-        nameInput.classList.add('shake');
-        setTimeout(() => nameInput.classList.remove('shake'), 400);
-        return;
+    addBtn.disabled = true;
+    try {
+      const snap = await get(namesRef);
+      if (snap.exists()) {
+        const entries = Object.values(snap.val() as Record<string, DbEntry>);
+        if (entries.some(en => en.name.toLowerCase() === name.toLowerCase())) {
+          nameInput.classList.add('shake');
+          setTimeout(() => nameInput.classList.remove('shake'), 400);
+          addBtn.disabled = false;
+          return;
+        }
       }
+      await push(namesRef, { name, joinedAt: Date.now() } satisfies DbEntry);
+      nameInput.value = '';
+      nameInput.focus();
+    } catch (err) {
+      console.error('Firebase push failed:', err);
+      alert(`Failed to add participant: ${(err as Error).message}`);
+    } finally {
+      addBtn.disabled = false;
     }
-    await push(namesRef, { name, joinedAt: Date.now() } satisfies DbEntry);
-    nameInput.value = '';
-    nameInput.focus();
   };
 
   addBtn.addEventListener('click', addName);

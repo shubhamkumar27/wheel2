@@ -164,7 +164,7 @@
       max-width: 520px;
     }
 
-    #qrCanvas {
+    #qrImg {
       border-radius: 8px;
       flex-shrink: 0;
     }
@@ -708,7 +708,7 @@
 
       <!-- QR Code -->
       <div class="qr-panel">
-        <canvas id="qrCanvas" width="80" height="80"></canvas>
+        <img id="qrImg" width="160" height="160" alt="QR Code — scan to join" style="border-radius:8px;background:#fff" />
         <div class="qr-info">
           <h3>📱 Scan to join the wheel</h3>
           <p>Participants scan this to add their name live:<br />
@@ -13768,11 +13768,11 @@
   }
   function initPresenterView() {
     const wheel = new WheelApp();
-    import_qrcode.default.toCanvas(
-      document.getElementById("qrCanvas"),
-      JOIN_URL,
-      { width: 160, margin: 1, color: { dark: "#0d0d1a", light: "#ffffff" } }
-    ).catch(console.error);
+    import_qrcode.default.toDataURL(JOIN_URL, { width: 320, margin: 2, color: { dark: "#000000", light: "#ffffff" } }).then((url) => {
+      document.getElementById("qrImg").src = url;
+    }).catch((err) => {
+      console.error("QR failed", err);
+    });
     onValue(namesRef, (snap) => {
       const data = snap.val();
       const map2 = /* @__PURE__ */ new Map();
@@ -13788,18 +13788,27 @@
     const addName = async () => {
       const name4 = sanitizeName(nameInput.value);
       if (!name4) return;
-      const snap = await get(namesRef);
-      if (snap.exists()) {
-        const entries = Object.values(snap.val());
-        if (entries.some((en) => en.name.toLowerCase() === name4.toLowerCase())) {
-          nameInput.classList.add("shake");
-          setTimeout(() => nameInput.classList.remove("shake"), 400);
-          return;
+      addBtn.disabled = true;
+      try {
+        const snap = await get(namesRef);
+        if (snap.exists()) {
+          const entries = Object.values(snap.val());
+          if (entries.some((en) => en.name.toLowerCase() === name4.toLowerCase())) {
+            nameInput.classList.add("shake");
+            setTimeout(() => nameInput.classList.remove("shake"), 400);
+            addBtn.disabled = false;
+            return;
+          }
         }
+        await push(namesRef, { name: name4, joinedAt: Date.now() });
+        nameInput.value = "";
+        nameInput.focus();
+      } catch (err) {
+        console.error("Firebase push failed:", err);
+        alert(`Failed to add participant: ${err.message}`);
+      } finally {
+        addBtn.disabled = false;
       }
-      await push(namesRef, { name: name4, joinedAt: Date.now() });
-      nameInput.value = "";
-      nameInput.focus();
     };
     addBtn.addEventListener("click", addName);
     nameInput.addEventListener("keydown", (e) => {
