@@ -1,0 +1,11 @@
+{
+  "rules": {
+    "names": {
+      ".read": true,
+      ".write": true,
+      "$nameId": {
+        ".validate": "newData.hasChildren(['name','joinedAt']) && newData.child('name').isString() && newData.child('name').val().length >= 1 && newData.child('name').val().length <= 60 && newData.child('joinedAt').isNumber()"
+      }
+    }
+  }
+}
