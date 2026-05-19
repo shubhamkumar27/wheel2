@@ -1,0 +1,16 @@
+{
+  "name": "wheel-of-names",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "build": "node build.mjs",
+    "dev": "node build.mjs && npx serve . -p 3000 --no-clipboard"
+  },
+  "devDependencies": {
+    "esbuild": "^0.21.0",
+    "qrcode": "^1.5.3",
+    "@types/qrcode": "^1.5.5",
+    "typescript": "^5.4.0",
+    "serve": "^14.2.0"
+  }
+}
